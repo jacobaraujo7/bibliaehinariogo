@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"name": "server",
+			"path": "server"
+		},
+		{
+			"name": "agent",
+			"path": "agent"
+		},
+		{
+			"name": "common",
+			"path": "common"
+		}
+	],
+	"settings": {}
+	
+}
