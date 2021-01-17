@@ -5,9 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "server",
+            "name": "server macos",
             "request": "launch",
             "deviceId": "macos",
+            "type": "dart"
+        },
+        {
+            "name": "server windows",
+            "request": "launch",
+            "deviceId": "windows",
             "type": "dart"
         }
     ]
