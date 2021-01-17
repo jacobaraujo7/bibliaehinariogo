@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'dart:typed_data';
+import 'package:flutter/services.dart' show rootBundle;
 import 'web_server.dart';
 
 class WebServerImpl extends WebServer {
@@ -21,14 +22,42 @@ class WebServerImpl extends WebServer {
       print('Listening on localhost:${_server?.port}');
       _controller.add(WebServerStatus.connected);
 
+      final path = 'assets/agent';
+
       await for (HttpRequest request in _server!) {
-        request.response.write('Hello, world!');
-        await request.response.close();
+        if (request.uri.path == '/') {
+          request.response.headers.contentType = ContentType.html;
+          final data = await getFileData('$path/index.html');
+          request.response.add(data);
+          await request.response.close();
+        } else if (request.uri.path == '/main.dart.js') {
+          request.response.headers.contentType = ContentType('text', 'javascript');
+          await request.response.addStream(Stream.fromFuture(getFileData('$path/main.dart.js')));
+          await request.response.close();
+        } else if (request.uri.path == '/manifest.json') {
+          request.response.headers.contentType = ContentType.json;
+          await request.response.addStream(Stream.fromFuture(getFileData('$path/manifest.json')));
+          await request.response.close();
+        } else if (request.uri.path == '/assets/FontManifest.json') {
+          request.response.headers.contentType = ContentType.json;
+          await request.response.addStream(Stream.fromFuture(getFileData('$path/assets/FontManifest.json')));
+          await request.response.close();
+        } else if (request.uri.path == '/assets/fonts/MaterialIcons-Regular.otf') {
+          request.response.headers.contentType = ContentType.json;
+          await request.response.addStream(Stream.fromFuture(getFileData('$path/assets/fonts/MaterialIcons-Regular.otf')));
+          await request.response.close();
+        } else {
+          print('Tebtatuvas: ${request.uri.path}');
+        }
       }
     } catch (e) {
       _controller.add(WebServerStatus.disconnected);
       print(e);
     }
+  }
+
+  Future<List<int>> getFileData(String path) async {
+    return rootBundle.loadStructuredData(path, (value) async => value.codeUnits);
   }
 
   @override
